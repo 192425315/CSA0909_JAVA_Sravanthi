@@ -1,89 +1,62 @@
 # Task 01 – Understand the Problem and Identify the Objects
 
 ## Aim
-To understand the Campus Smart-Parking System and identify the classes and objects needed to develop the system using Java.
+To understand the Campus Smart-Parking System and identify the basic information required to manage vehicles and parking slots using Java.
 
 ## Problem Description
-In a college campus, many students, staff members and visitors use the parking facility. The parking area contains different floors and parking slots for vehicles.
+The Campus Smart-Parking System is designed to manage vehicle parking inside a college campus. Students, staff and visitors use the parking facility to park their vehicles.
 
-When a vehicle enters the campus, the system should assign an available parking slot and generate a parking ticket. The system should also store the vehicle details and entry time. When the vehicle leaves, the slot should become available for another vehicle.
+The system needs to maintain vehicle details, allocate parking slots, generate ticket numbers and record the entry time. This program demonstrates the basic parking information using Java.
 
-To implement this system, I identified the important objects and created Java classes to represent them.
-
-## Classes Used
-
-**1. Vehicle**
-
-The `Vehicle` class stores the vehicle's registration number and type. It also checks that the details are not empty.
-
-**2. ParkingSlot**
-
-The `ParkingSlot` class represents an individual parking slot. It checks whether the slot is available and prevents another vehicle from occupying an already occupied slot.
-
-**3. ParkingTicket**
-
-The `ParkingTicket` class generates a ticket number and stores the vehicle details and entry time. It also displays the parking ticket information.
+## Program Description
+In this program, I used Java variables to store the vehicle registration number, vehicle type, floor number, slot number and ticket number. The program displays these details along with a success message and the current entry time.
 
 ## Input
 - Vehicle registration number
 - Vehicle type
 - Floor number
 - Slot number
+- Ticket number
 
 ## Output
-- Vehicle parking status
-- Assigned floor and slot number
-- Parking ticket number
-- Vehicle details
-- Entry time
+The program displays the parking status, floor number, slot number, ticket number, vehicle registration number, vehicle type and entry time.
 
-## Business Rules
-1. Every vehicle must have a registration number and vehicle type.
-2. A parking slot can contain only one vehicle at a time.
-3. A ticket can be generated only for a valid vehicle.
-4. Floor and slot numbers cannot be negative.
-5. An occupied parking slot cannot accept another vehicle.
+## Software Requirements
+- Java
+- Online Java compiler
 
 ## Algorithm
-1. Create a vehicle object with its registration number and type.
-2. Create a parking slot object.
-3. Check whether the parking slot is available.
-4. If the slot is available, park the vehicle.
-5. Generate a parking ticket and display the details.
-6. If the slot is occupied, display a message that the slot is unavailable.
+1. Start the program.
+2. Store the vehicle registration number and vehicle type.
+3. Store the floor number, slot number and ticket number.
+4. Display the parking success message.
+5. Display the vehicle and parking details.
+6. Display the current entry time.
+7. Stop the program.
 
-## How to Run the Program
-
-I used Java to implement the program.
-
-Open the terminal in the `Task01` folder and execute the following commands:
-
-```bash
-javac Task01.java
-java Task01
-```
+## How to Run
+1. Open an online Java compiler.
+2. Copy the code into the editor.
+3. Run the program.
+4. Check the output displayed on the screen.
+5. Take a screenshot of the output and save it as `output.png`.
 
 ## Expected Output
 
 ```text
+Campus Smart-Parking System
+---------------------------
 Vehicle parked successfully.
-Floor: 0, Slot: 1
+Floor: 0
+Slot: 1
 Ticket Number: 1001
 Registration Number: TN01AB1234
 Vehicle Type: Car
-Entry Time: <runtime date and time>
+Entry Time: <current date and time>
 ```
 
-The entry time will be different each time the program runs.
-
-## Alternative Approach
-
-Instead of creating a separate `Vehicle` object, we could store vehicle details in parallel arrays such as `regNo[]`, `type[]` and `entryTime[]`.
-
-Both approaches require a linear search, which takes O(n) time in the worst case when searching through n vehicles.
-
-However, the object-oriented approach keeps the details of each vehicle together. If I need to add another property, such as the vehicle colour, I can add it to the `Vehicle` class. With parallel arrays, I would need to maintain another array and ensure that all the indices remain consistent.
+The entry time changes each time the program is executed.
 
 ## Result
+The program was executed in an online Java compiler and displayed the basic vehicle details, parking information, ticket number and entry time.
 
-I identified the main objects required for the Campus Smart-Parking System and implemented the `Vehicle`, `ParkingSlot` and `ParkingTicket` classes in Java. The program demonstrates basic object-oriented programming, data validation and parking-slot management.
