@@ -1,61 +1,45 @@
 
-class ParkingTicket {
-    private int ticketNumber;
-    private String registrationNumber;
-    private String vehicleType;
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 
-    // Default constructor
-    public ParkingTicket() {
-        this(1001, "TN01AB1234", "Car");
+public class ParkingTicket {
+    int ticketNo;
+    String regNo;
+    LocalDateTime entryTime;
+
+    static int nextTicketNo = 1001;
+
+    ParkingTicket() {
+        this("NOT-ASSIGNED");
     }
 
-    // Parameterized constructor
-    public ParkingTicket(int ticketNumber, String registrationNumber,
-                         String vehicleType) {
-        this.ticketNumber = ticketNumber;
-        this.registrationNumber = registrationNumber;
-        this.vehicleType = vehicleType;
+    ParkingTicket(String regNo) {
+        ticketNo = nextTicketNo++;
+        this.regNo = regNo;
+        entryTime = LocalDateTime.now();
     }
 
-    // Copy constructor
-    public ParkingTicket(ParkingTicket other) {
-        this(other.ticketNumber, other.registrationNumber,
-             other.vehicleType);
+    void displayTicket() {
+        DateTimeFormatter f =
+            DateTimeFormatter.ofPattern("dd-MM-yyyy HH:mm:ss");
+
+        System.out.println("Ticket Number: " + ticketNo);
+        System.out.println("Registration Number: " + regNo);
+        System.out.println("Entry Time: " + entryTime.format(f));
+        System.out.println("-------------------------");
     }
 
-    // Display ticket details
-    public void displayTicket() {
-        System.out.println("Ticket Number: " + ticketNumber);
-        System.out.println("Registration Number: " + registrationNumber);
-        System.out.println("Vehicle Type: " + vehicleType);
-        System.out.println("---------------------------");
-    }
-}
-
-public class Main {
     public static void main(String[] args) {
-        // Create an object using the default constructor
-        ParkingTicket ticket1 = new ParkingTicket();
+        ParkingTicket t1 = new ParkingTicket();
+        ParkingTicket t2 = new ParkingTicket("TN01AB1234");
+        ParkingTicket t3 = new ParkingTicket("TN02CD5678");
 
-        // Create an object using the parameterized constructor
-        ParkingTicket ticket2 = new ParkingTicket(
-            1002, "TN02CD5678", "Two-Wheeler"
-        );
-
-        // Create a copy of ticket2
-        ParkingTicket ticket3 = new ParkingTicket(ticket2);
-
-        System.out.println("Campus Smart-Parking System");
+        System.out.println("CAMPUS SMART-PARKING SYSTEM");
         System.out.println("===========================");
 
-        System.out.println("Default Constructor:");
-        ticket1.displayTicket();
-
-        System.out.println("Parameterized Constructor:");
-        ticket2.displayTicket();
-
-        System.out.println("Copy Constructor:");
-        ticket3.displayTicket();
+        t1.displayTicket();
+        t2.displayTicket();
+        t3.displayTicket();
     }
 }
 
