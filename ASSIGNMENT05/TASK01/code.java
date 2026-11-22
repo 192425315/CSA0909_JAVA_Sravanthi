@@ -1,100 +1,116 @@
 
-import java.io.BufferedReader;
-import java.io.BufferedWriter;
-import java.io.IOException;
-import java.nio.charset.StandardCharsets;
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.nio.file.StandardOpenOption;
-import java.util.Arrays;
+import java.io.*;
+import java.util.*;
 
-public class PassStore {
+public class BusPass {
 
-    private final Path file;
+    static final String FILE = "buspasses.txt";
 
-    PassStore(Path file) {
-        this.file = file;
-    }
+    // Add a new bus pass
+    static void addPass(String id, String regNo, String name,
+                        int route, String stop, String date,
+                        double amount) throws IOException {
 
-    public void add(String passId, String regNo,
-                    String name, int route, double amount)
-                    throws IOException {
+        try (BufferedWriter bw = new BufferedWriter(
+                new FileWriter(FILE, true))) {
 
-        try (BufferedWriter w = Files.newBufferedWriter(
-                file,
-                StandardCharsets.UTF_8,
-                StandardOpenOption.CREATE,
-                StandardOpenOption.APPEND)) {
+            bw.write(String.join(",",
+                    id, regNo, name, String.valueOf(route),
+                    stop, date, String.valueOf(amount)));
 
-            w.write(String.join(",",
-                    passId,
-                    regNo,
-                    name,
-                    String.valueOf(route),
-                    String.valueOf(amount)));
-
-            w.newLine();
+            bw.newLine();
+            System.out.println("Bus pass added successfully!");
         }
     }
 
-    public String[] find(String passId) throws IOException {
+    // Find bus pass using ID
+    static void findPass(String id) throws IOException {
 
-        if (!Files.exists(file)) {
-            return null;
+        File file = new File(FILE);
+
+        if (!file.exists()) {
+            System.out.println("File not found!");
+            return;
         }
 
-        try (BufferedReader br = Files.newBufferedReader(
-                file, StandardCharsets.UTF_8)) {
+        try (BufferedReader br = new BufferedReader(
+                new FileReader(file))) {
 
             String line;
 
             while ((line = br.readLine()) != null) {
+                String[] data = line.split(",", -1);
 
-                String[] fields = line.split(",", -1);
-
-                // Skip damaged lines
-                if (fields.length != 5) {
+                if (data.length != 7) {
                     continue;
                 }
 
                 try {
-                    Integer.parseInt(fields[3]);
-                    Double.parseDouble(fields[4]);
+                    Integer.parseInt(data[3]);
+                    Double.parseDouble(data[6]);
                 } catch (NumberFormatException e) {
                     continue;
                 }
 
-                if (fields[0].equals(passId)) {
-                    return fields;
+                if (data[0].equals(id)) {
+                    System.out.println("Pass Found:");
+                    System.out.println(line);
+                    return;
                 }
             }
         }
 
-        return null;
+        System.out.println("Pass Not Found!");
+    }
+
+    // List bus passes by route
+    static void listByRoute(int route) throws IOException {
+
+        File file = new File(FILE);
+
+        if (!file.exists()) {
+            System.out.println("File not found!");
+            return;
+        }
+
+        try (BufferedReader br = new BufferedReader(
+                new FileReader(file))) {
+
+            String line;
+
+            while ((line = br.readLine()) != null) {
+                String[] data = line.split(",", -1);
+
+                if (data.length != 7) {
+                    continue;
+                }
+
+                try {
+                    int routeNo = Integer.parseInt(data[3]);
+                    Double.parseDouble(data[6]);
+
+                    if (routeNo == route) {
+                        System.out.println(line);
+                    }
+                } catch (NumberFormatException e) {
+                    // Skip damaged record
+                }
+            }
+        }
     }
 
     public static void main(String[] args) throws IOException {
 
-        Path f = Files.createTempFile("passes", ".csv");
+        addPass("P1001", "192425315", "Sravanthi",
+                12, "Avadi", "2027-03-31", 4500);
 
-        PassStore store = new PassStore(f);
+        addPass("P1002", "192425316", "Arun",
+                7, "Chennai", "2027-04-30", 3800);
 
-        store.add("P1001", "192311001", "Arun", 12, 4500);
+        System.out.println("\nSearching Pass:");
+        findPass("P1001");
 
-        Files.writeString(
-                f,
-                "P1002,DAMAGED LINE\n",
-                StandardOpenOption.APPEND
-        );
-
-        store.add("P1003", "192311003", "Divya", 7, 3800);
-
-        System.out.println(Arrays.toString(
-                store.find("P1003")));
-
-        System.out.println(Arrays.toString(
-                store.find("P1002")));
-
-        Files.deleteIfExists(f);
+        System.out.println("\nPasses in Route 12:");
+        listByRoute(12);
     }
 }
