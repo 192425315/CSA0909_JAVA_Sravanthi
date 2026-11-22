@@ -1,23 +1,77 @@
-# Task 01 – Design a File Format
+# TASK 1 – BUS PASS MANAGEMENT SYSTEM
 
-**Course:** CSA09 – Programming in Java  
-**Assignment:** Assignment 5 – CO5  
-**Student Name:** D. Sravanthi  
-**Register Number:** 192425315
+## Student Details
+- **Student Name:** D. Sravanthi
+- **Register Number:** 192425315
+- **Department:** Artificial Intelligence and Machine Learning
+- **Course:** CSA09 – Programming in Java
+- **Assignment:** Assignment 5 – CO5
 
-## Objective
-To design a file format for storing university bus-pass records using delimited text and binary files.
+## Aim
+To develop a Java application to store, search and display university bus-pass records using Java file handling concepts.
 
-## Concepts Used
-- File handling
-- BufferedReader
+## Technologies Used
+- Java
+- File Handling
+- FileWriter
+- FileReader
 - BufferedWriter
-- DataOutputStream
-- RandomAccessFile
-- Time complexity
+- BufferedReader
+- Exception Handling
 
-## Files
-- Solution.md – Record layouts, pseudocode and explanations.
+## Program Description
+The Bus Pass Management System performs the following operations:
+
+1. Add new bus-pass records.
+2. Search for a bus pass using Pass ID.
+3. Display bus passes according to route number.
+4. Skip damaged records while reading the file.
+5. Display a message when a pass is not found.
+
+## File Structure
+```text
+Task01_A1_File_Format/
+│
+├── BusPass.java
+└── README.md
+```
+
+The program creates a temporary text file automatically during execution.
+
+## How to Execute
+
+**Step 1:** Open Programiz Java Online Compiler.
+
+**Step 2:** Copy the `BusPass.java` source code.
+
+**Step 3:** Paste the code into the Java editor.
+
+**Step 4:** Click the Run button.
+
+## Expected Output
+```text
+===== BUS PASS MANAGEMENT SYSTEM =====
+Bus pass added successfully!
+Bus pass added successfully!
+Bus pass added successfully!
+
+===== SEARCH BUS PASS =====
+Pass Found:
+P1001,192425315,Sravanthi,12,Avadi,2027-03-31,4500.0
+
+===== SEARCH INVALID PASS =====
+Pass Not Found!
+
+===== ROUTE-WISE BUS PASSES =====
+Bus Passes for Route 12:
+P1001,192425315,Sravanthi,12,Avadi,2027-03-31,4500.0
+P1003,192425317,Divya,12,Ambattur,2027-05-31,4200.0
+
+Program executed successfully!
+```
 
 ## Result
-Designed text and binary file formats and explained adding, searching, listing and handling damaged records.
+Successfully implemented the Bus Pass Management System using Java file handling. The program performs insertion, searching and route-wise listing of bus-pass records.
+
+## Conclusion
+Java file handling helps store and retrieve information efficiently. BufferedReader and BufferedWriter make reading and writing operations easier.
