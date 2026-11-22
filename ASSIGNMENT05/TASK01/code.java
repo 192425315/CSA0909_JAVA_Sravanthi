@@ -1,10 +1,18 @@
 
 import java.io.*;
-import java.util.*;
 
 public class BusPass {
 
-    static final String FILE = "buspasses.txt";
+    // Create a temporary writable file
+    static final String FILE;
+
+    static {
+        try {
+            FILE = File.createTempFile("buspasses", ".txt").getAbsolutePath();
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
+    }
 
     // Add a new bus pass
     static void addPass(String id, String regNo, String name,
@@ -14,33 +22,28 @@ public class BusPass {
         try (BufferedWriter bw = new BufferedWriter(
                 new FileWriter(FILE, true))) {
 
-            bw.write(String.join(",",
-                    id, regNo, name, String.valueOf(route),
-                    stop, date, String.valueOf(amount)));
+            bw.write(id + "," + regNo + "," + name + "," +
+                    route + "," + stop + "," + date + "," + amount);
 
             bw.newLine();
+
             System.out.println("Bus pass added successfully!");
         }
     }
 
-    // Find bus pass using ID
+    // Find a pass using Pass ID
     static void findPass(String id) throws IOException {
 
-        File file = new File(FILE);
-
-        if (!file.exists()) {
-            System.out.println("File not found!");
-            return;
-        }
-
         try (BufferedReader br = new BufferedReader(
-                new FileReader(file))) {
+                new FileReader(FILE))) {
 
             String line;
 
             while ((line = br.readLine()) != null) {
+
                 String[] data = line.split(",", -1);
 
+                // Skip damaged records
                 if (data.length != 7) {
                     continue;
                 }
@@ -63,22 +66,19 @@ public class BusPass {
         System.out.println("Pass Not Found!");
     }
 
-    // List bus passes by route
+    // Display passes by route number
     static void listByRoute(int route) throws IOException {
 
-        File file = new File(FILE);
-
-        if (!file.exists()) {
-            System.out.println("File not found!");
-            return;
-        }
-
         try (BufferedReader br = new BufferedReader(
-                new FileReader(file))) {
+                new FileReader(FILE))) {
 
             String line;
+            boolean found = false;
+
+            System.out.println("Bus Passes for Route " + route + ":");
 
             while ((line = br.readLine()) != null) {
+
                 String[] data = line.split(",", -1);
 
                 if (data.length != 7) {
@@ -91,26 +91,47 @@ public class BusPass {
 
                     if (routeNo == route) {
                         System.out.println(line);
+                        found = true;
                     }
+
                 } catch (NumberFormatException e) {
-                    // Skip damaged record
+                    continue;
                 }
+            }
+
+            if (!found) {
+                System.out.println("No passes found for this route.");
             }
         }
     }
 
+    // Main method
     public static void main(String[] args) throws IOException {
 
+        System.out.println("===== BUS PASS MANAGEMENT SYSTEM =====");
+
+        // Add records
         addPass("P1001", "192425315", "Sravanthi",
                 12, "Avadi", "2027-03-31", 4500);
 
         addPass("P1002", "192425316", "Arun",
                 7, "Chennai", "2027-04-30", 3800);
 
-        System.out.println("\nSearching Pass:");
+        addPass("P1003", "192425317", "Divya",
+                12, "Ambattur", "2027-05-31", 4200);
+
+        // Search record
+        System.out.println("\n===== SEARCH BUS PASS =====");
         findPass("P1001");
 
-        System.out.println("\nPasses in Route 12:");
+        // Search non-existing record
+        System.out.println("\n===== SEARCH INVALID PASS =====");
+        findPass("P9999");
+
+        // List by route
+        System.out.println("\n===== ROUTE-WISE BUS PASSES =====");
         listByRoute(12);
+
+        System.out.println("\nProgram executed successfully!");
     }
 }
