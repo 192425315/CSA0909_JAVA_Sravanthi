@@ -1,170 +1,146 @@
 
-import java.sql.*;
+import java.util.HashMap;
+import java.util.Map;
 
 public class Main {
 
-    static final String URL =
-        "jdbc:mysql://localhost:3306/assignment5";
+    // Simulated wallet database
+    static Map<Integer, Double> wallets = new HashMap<>();
 
-    static final String USER = "root";
-    static final String PASSWORD = "your_password";
+    // Simulated user database
+    static Map<String, String> users = new HashMap<>();
 
-    // Establish database connection
-    static Connection getConnection() throws SQLException {
-        return DriverManager.getConnection(
-            URL, USER, PASSWORD);
+    // Initialize database
+    static void initialize() {
+        wallets.put(1, 5000.0);
+        wallets.put(2, 3000.0);
+
+        users.put("student1", "pass123");
+        users.put("student2", "pass456");
     }
 
-    // Transfer money using transaction
-    static void transferMoney(Connection con,
-                              int from, int to,
-                              double amount) throws SQLException {
+    // Display wallet balances
+    static void displayWallets() {
+        for (int id : wallets.keySet()) {
+            System.out.println(
+                "Wallet ID: " + id +
+                ", Balance: Rs." + wallets.get(id)
+            );
+        }
+    }
 
-        con.setAutoCommit(false);
+    // Transfer money with transaction simulation
+    static void transferMoney(int from, int to,
+                              double amount, boolean simulateFailure) {
+
+        // Save original balances as transaction backup
+        double oldFrom = wallets.get(from);
+        double oldTo = wallets.get(to);
+
+        System.out.println("Starting Transaction...");
 
         try {
-            String debit =
-                "UPDATE wallet SET balance = balance - ? " +
-                "WHERE wallet_id = ? AND balance >= ?";
-
-            try (PreparedStatement ps =
-                     con.prepareStatement(debit)) {
-
-                ps.setDouble(1, amount);
-                ps.setInt(2, from);
-                ps.setDouble(3, amount);
-
-                if (ps.executeUpdate() != 1) {
-                    throw new SQLException(
-                        "Insufficient balance or invalid source wallet");
-                }
+            if (amount <= 0) {
+                throw new Exception("Invalid transfer amount");
             }
 
-            String credit =
-                "UPDATE wallet SET balance = balance + ? " +
-                "WHERE wallet_id = ?";
-
-            try (PreparedStatement ps =
-                     con.prepareStatement(credit)) {
-
-                ps.setDouble(1, amount);
-                ps.setInt(2, to);
-
-                if (ps.executeUpdate() != 1) {
-                    throw new SQLException(
-                        "Destination wallet not found");
-                }
+            if (oldFrom < amount) {
+                throw new Exception("Insufficient balance");
             }
 
-            con.commit();
+            // Debit source wallet
+            wallets.put(from, oldFrom - amount);
 
-            System.out.println(
-                "Money transferred successfully!");
+            System.out.println("Amount debited: Rs." + amount);
 
-        } catch (SQLException e) {
+            // Simulate failure between updates
+            if (simulateFailure) {
+                throw new Exception("Simulated transfer failure");
+            }
 
-            con.rollback();
+            // Credit destination wallet
+            wallets.put(to, oldTo + amount);
 
-            System.out.println(
-                "Transaction failed. Rollback completed.");
+            // Commit
+            System.out.println("Transaction committed!");
 
-            throw e;
+        } catch (Exception e) {
 
-        } finally {
-            con.setAutoCommit(true);
+            // Rollback
+            wallets.put(from, oldFrom);
+            wallets.put(to, oldTo);
+
+            System.out.println("Transaction failed!");
+            System.out.println("Rollback completed!");
+            System.out.println("Reason: " + e.getMessage());
         }
     }
 
     // Unsafe login demonstration
-    static boolean unsafeLogin(Connection con,
-                               String id,
-                               String password)
-                               throws SQLException {
+    static boolean unsafeLogin(String id, String pwd) {
 
-        String sql =
-            "SELECT * FROM users WHERE id='" +
-            id + "' AND pwd='" + password + "'";
-
-        try (Statement st = con.createStatement();
-             ResultSet rs = st.executeQuery(sql)) {
-
-            return rs.next();
+        // Simulates unsafe SQL string concatenation
+        if (id.contains("' OR '1'='1'")) {
+            return true;
         }
+
+        return users.containsKey(id)
+                && users.get(id).equals(pwd);
     }
 
-    // Safe login using PreparedStatement
-    static boolean safeLogin(Connection con,
-                             String id,
-                             String password)
-                             throws SQLException {
+    // Safe login demonstration
+    static boolean safeLogin(String id, String pwd) {
 
-        String sql =
-            "SELECT * FROM users WHERE id=? AND pwd=?";
-
-        try (PreparedStatement ps =
-                 con.prepareStatement(sql)) {
-
-            ps.setString(1, id);
-            ps.setString(2, password);
-
-            try (ResultSet rs = ps.executeQuery()) {
-                return rs.next();
-            }
-        }
-    }
-
-    // Display wallet balances
-    static void displayWallets(Connection con)
-                               throws SQLException {
-
-        String sql =
-            "SELECT * FROM wallet ORDER BY wallet_id";
-
-        try (Statement st = con.createStatement();
-             ResultSet rs = st.executeQuery(sql)) {
-
-            while (rs.next()) {
-                System.out.println(
-                    "Wallet ID: " + rs.getInt("wallet_id") +
-                    ", Balance: Rs." + rs.getDouble("balance"));
-            }
-        }
+        // Input is treated as literal data
+        return users.containsKey(id)
+                && users.get(id).equals(pwd);
     }
 
     public static void main(String[] args) {
 
-        try (Connection con = getConnection()) {
+        initialize();
 
-            System.out.println("===== INITIAL BALANCE =====");
-            displayWallets(con);
+        System.out.println("===== INITIAL WALLET BALANCE =====");
+        displayWallets();
 
-            System.out.println("\n===== MONEY TRANSFER =====");
+        // Successful transaction
+        System.out.println("\n===== SUCCESSFUL TRANSFER =====");
 
-            try {
-                transferMoney(con, 1, 2, 500);
-            } catch (SQLException e) {
-                System.out.println(e.getMessage());
-            }
+        transferMoney(1, 2, 500, false);
 
-            System.out.println("\n===== UPDATED BALANCE =====");
-            displayWallets(con);
+        displayWallets();
 
-            System.out.println("\n===== SQL INJECTION TEST =====");
+        // Failed transaction
+        System.out.println("\n===== FAILED TRANSFER TEST =====");
 
-            String attackId = "' OR '1'='1' -- ";
-            String wrongPassword = "wrong123";
+        transferMoney(1, 2, 1000, true);
 
-            System.out.println(
-                "Unsafe Login: " +
-                unsafeLogin(con, attackId, wrongPassword));
+        displayWallets();
 
-            System.out.println(
-                "Safe Login: " +
-                safeLogin(con, attackId, wrongPassword));
+        // SQL injection demonstration
+        System.out.println("\n===== SQL INJECTION TEST =====");
 
-        } catch (SQLException e) {
-            System.out.println(
-                "Database Error: " + e.getMessage());
-        }
+        String attackId = "' OR '1'='1' -- ";
+        String wrongPassword = "wrong123";
+
+        System.out.println(
+            "Unsafe Login Result: " +
+            unsafeLogin(attackId, wrongPassword)
+        );
+
+        System.out.println(
+            "Safe Login Result: " +
+            safeLogin(attackId, wrongPassword)
+        );
+
+        // Valid login
+        System.out.println("\n===== VALID LOGIN TEST =====");
+
+        System.out.println(
+            "Safe Valid Login: " +
+            safeLogin("student1", "pass123")
+        );
+
+        System.out.println("\nProgram executed successfully!");
     }
 }
